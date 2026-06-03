@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="512" viewBox="0 0 1024 512">
+  <rect width="1024" height="512" rx="22" fill="#1b2026" stroke="#cbb486" stroke-width="6"/>
+  <line x1="32" y1="58" x2="992" y2="58" stroke="#c94b40" stroke-width="8"/>
+  <text x="44" y="140" fill="#efe3c1" font-family="Microsoft YaHei, Noto Sans SC, sans-serif" font-size="74" font-weight="700">双棱镜</text>
+  <text x="44" y="214" fill="#d8c9a4" font-family="Consolas, Microsoft YaHei, monospace" font-size="44" font-weight="700">FRESNEL BIPRISM</text>
+  <line x1="44" y1="250" x2="978" y2="250" stroke="#e4d4ae" stroke-width="4"/>
+  <text x="44" y="320" fill="#efe3c1" font-family="Microsoft YaHei, Noto Sans SC, sans-serif" font-size="42">波前分割形成双虚光源</text>
+  <text x="44" y="380" fill="#baa983" font-family="Consolas, Microsoft YaHei, monospace" font-size="28">OPTICAL GLASS / HANDLE WITH CARE</text>
+  <text x="44" y="432" fill="#d75a4d" font-family="Microsoft YaHei, Noto Sans SC, sans-serif" font-size="28" font-weight="700">CAUTION  请勿触碰棱边与透光面</text>
+</svg>

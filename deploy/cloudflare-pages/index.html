@@ -1,0 +1,781 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>双棱镜干涉数据处理插件</title>
+    <style>
+      :root {
+        --paper: #fffaf3;
+        --paper-deep: #fff4e7;
+        --ink: #1f2d3d;
+        --muted: #677789;
+        --line: #e8dccc;
+        --accent: #dd6ea8;
+        --accent-soft: #ffe3f0;
+        --sky: #78a8d8;
+        --sky-soft: #e8f2ff;
+        --shadow: 0 16px 36px rgba(83, 59, 34, 0.1);
+        --radius: 22px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background:
+          radial-gradient(circle at top left, rgba(255, 255, 255, 0.92), transparent 28%),
+          linear-gradient(180deg, #f6eee2 0%, #fbf7f0 48%, #f5efe7 100%);
+        color: var(--ink);
+        font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans SC", sans-serif;
+      }
+
+      body {
+        padding: 2px;
+      }
+
+      button,
+      input,
+      table {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #dbc8b4;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.92);
+        color: var(--ink);
+      }
+
+      input:focus {
+        outline: none;
+        border-color: #d88ab3;
+        box-shadow: 0 0 0 4px rgba(221, 110, 168, 0.14);
+      }
+
+      .page {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        display: grid;
+        gap: 8px;
+      }
+
+      .hero,
+      .panel,
+      .result-card {
+        background: rgba(255, 250, 243, 0.94);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+      }
+
+      .hero {
+        padding: 16px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .eyebrow {
+        margin: 0;
+        color: #b86b8d;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        font-size: clamp(26px, 6vw, 38px);
+        line-height: 1.15;
+      }
+
+      .hero p:last-child {
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .hero-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .hero-tags span {
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: #a14f79;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .action-row,
+      .single-row,
+      .metric-grid,
+      .repeat-grid {
+        display: grid;
+        gap: 12px;
+      }
+
+      .action-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .single-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .metric-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .repeat-grid {
+        grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+      }
+
+      .ghost-btn {
+        border: 1px solid #d8c8b6;
+        background: rgba(255, 255, 255, 0.75);
+        color: var(--ink);
+        border-radius: 999px;
+        padding: 11px 14px;
+        font-weight: 700;
+      }
+
+      .panel {
+        padding: 14px;
+        display: grid;
+        gap: 12px;
+      }
+
+      .panel-head {
+        display: block;
+      }
+
+      .panel-head p {
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
+      .field-card,
+      .result-card,
+      .formula-box,
+      .fit-box {
+        border-radius: 18px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.78);
+      }
+
+      .field-card {
+        padding: 12px;
+        display: grid;
+        gap: 8px;
+      }
+
+      .field-card span,
+      .result-card span,
+      .table-note,
+      .formula-box p,
+      .fit-box p {
+        color: var(--muted);
+      }
+
+      .field-card strong {
+        font-size: 24px;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 620px;
+      }
+
+      th,
+      td {
+        padding: 10px 8px;
+        border-bottom: 1px dashed #e8dccc;
+        text-align: left;
+        vertical-align: middle;
+      }
+
+      th {
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        min-height: 40px;
+        padding: 0 12px;
+        border-radius: 999px;
+        background: var(--sky-soft);
+        color: #4279b3;
+        font-weight: 800;
+      }
+
+      .result-card {
+        padding: 14px;
+        display: grid;
+        gap: 8px;
+        min-width: 0;
+      }
+
+      .result-card strong {
+        font-size: 30px;
+        line-height: 1.08;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+      }
+
+      .repeat-grid .result-card strong {
+        font-size: clamp(22px, 4vw, 30px);
+      }
+
+      .repeat-grid .result-card {
+        height: 100%;
+      }
+
+      .repeat-grid .result-card.average-card {
+        grid-column: span 2;
+      }
+
+      .result-card.primary {
+        background: linear-gradient(180deg, #fff0f7, #fffafc);
+        border-color: #ebcade;
+      }
+
+      .result-card.blue {
+        background: linear-gradient(180deg, #edf6ff, #fbfdff);
+        border-color: #d1e3f7;
+      }
+
+      .formula-box,
+      .fit-box {
+        padding: 12px 14px;
+        line-height: 1.7;
+      }
+
+      .formula {
+        font-size: 20px;
+        font-weight: 800;
+        color: #b55683;
+      }
+
+      .summary-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .summary-item {
+        padding: 12px 14px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.74);
+        border: 1px solid var(--line);
+        line-height: 1.7;
+      }
+
+      .footer-note {
+        text-align: center;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      @media (max-width: 760px) {
+        .action-row,
+        .single-row,
+        .metric-grid,
+        .repeat-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .repeat-grid .result-card.average-card {
+          grid-column: span 1;
+        }
+
+        .result-card strong {
+          font-size: 26px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <section class="hero">
+        <p class="eyebrow">Chaoxing Plugin</p>
+        <h1>双棱镜干涉数据分析</h1>
+        <!-- <p>适用于学习通环境的单文件数据分析插件，保留数据录入、自动计算与结果代入等核心功能。</p> -->
+        <!-- <div class="hero-tags">
+          <span>单文件</span>
+          <span>移动端适配</span>
+          <span>实时计算</span>
+          <span>适合嵌入</span>
+        </div> -->
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>快捷操作</h2>
+            <p>可载入示例数据或清空后重新录入。</p>
+          </div>
+        </div>
+        <div class="action-row">
+          <button id="fillExampleBtn" type="button" class="ghost-btn">填入示例数据</button>
+          <button id="clearBtn" type="button" class="ghost-btn">清空全部数据</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>1. D 的测量</h2>
+            <p>D 采用单次测量值录入方式。</p>
+          </div>
+        </div>
+        <div class="single-row">
+          <label class="field-card">
+            <span>D / m</span>
+            <input id="dInput" type="number" step="0.001" min="0" />
+          </label>
+          <div class="result-card blue">
+            <span>当前 D</span>
+            <strong id="dValueCard">--</strong>
+            <p>该数值用于波长计算公式代入。</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>2. Δx 的计算</h2>
+            <p>本部分包括线性拟合与五组重复测量平均值计算。</p>
+          </div>
+        </div>
+
+        <div class="fit-box">
+          <h3>2.1 条纹位置拟合</h3>
+          <p class="table-note">条纹序号按 0 到 9 输入，位置 x 单位为 mm；斜率就是拟合得到的 Δx。</p>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>组次</th>
+                <th>条纹序号 k</th>
+                <th>位置 x / mm</th>
+                <th>相邻组 Δx / mm</th>
+              </tr>
+            </thead>
+            <tbody id="fringeTable"></tbody>
+          </table>
+        </div>
+
+        <div class="metric-grid">
+          <div class="result-card">
+            <span>拟合得到 Δx</span>
+            <strong id="fitDeltaXValue">--</strong>
+            <p id="fitEquationText">请输入不少于 2 组有效条纹数据。</p>
+          </div>
+          <div class="result-card blue">
+            <span>拟合质量</span>
+            <strong id="fitR2Value">--</strong>
+            <p>显示线性拟合决定系数 R²。</p>
+          </div>
+        </div>
+
+        <div class="fit-box">
+          <h3>2.2 五组 Δx 平均</h3>
+          <p class="table-note">录入 5 组 Δx 测量值后，系统自动计算平均值。</p>
+        </div>
+
+        <div class="repeat-grid" id="deltaXRepeatGrid"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>3. d 的计算</h2>
+            <p>录入 d1、d2 后自动计算各组 d 及其平均值。</p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>组次</th>
+                <th>d1 / mm</th>
+                <th>d2 / mm</th>
+                <th>d = √(d1·d2) / mm</th>
+              </tr>
+            </thead>
+            <tbody id="dCalcTable"></tbody>
+          </table>
+        </div>
+
+        <div class="metric-grid">
+          <div class="result-card">
+            <span>d 平均值</span>
+            <strong id="dAverageValue">--</strong>
+            <p>由 5 组 d 的计算结果求平均值得到。</p>
+          </div>
+          <div class="result-card blue">
+            <span>本次代入使用</span>
+            <strong id="deltaXAverageValue">--</strong>
+            <p>优先采用五组平均 Δx；未录入时采用拟合 Δx。</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>4. 最后代入</h2>
+            <p>根据上方已录入数据自动生成计算结果。</p>
+          </div>
+        </div>
+
+        <div class="formula-box">
+          <div class="formula">λ = (d / D) · Δx</div>
+          <p id="formulaSubText">当前代入：λ = (-- / --) × --</p>
+        </div>
+
+        <div class="metric-grid">
+          <div class="result-card primary">
+            <span>测得波长 λ</span>
+            <strong id="lambdaValue">--</strong>
+            <p id="lambdaNote">理论值 589.3 nm。</p>
+          </div>
+          <div class="result-card">
+            <span>数据摘要</span>
+            <strong id="summaryValue">--</strong>
+            <p>汇总当前 D、Δx、d 的取值状态。</p>
+          </div>
+        </div>
+
+        <div class="summary-list" id="summaryList"></div>
+      </section>
+
+      <p class="footer-note">本页面为独立学习通插件版本，不影响原仿真页面与完整版数据处理页面。</p>
+    </div>
+
+    <script>
+      const THEORETICAL_LAMBDA_NM = 589.3;
+      const DEFAULT_STATE = {
+        D: 0.672,
+        fringeRows: Array.from({ length: 10 }, (_, index) => ({
+          index: index + 1,
+          k: index,
+          x: Number((12.116 + index * 0.6244 + [0, 0.006, -0.004, 0.005, -0.003, 0.004, -0.005, 0.003, -0.004, 0.002][index]).toFixed(3)),
+        })),
+        deltaXRows: [0.624, 0.627, 0.623, 0.626, 0.625],
+        dRows: [
+          { index: 1, d1: 2.486, d2: 0.651 },
+          { index: 2, d1: 2.481, d2: 0.649 },
+          { index: 3, d1: 2.484, d2: 0.65 },
+          { index: 4, d1: 2.483, d2: 0.648 },
+          { index: 5, d1: 2.485, d2: 0.652 },
+        ],
+      };
+
+      const state = structuredClone(DEFAULT_STATE);
+
+      const dInput = document.querySelector("#dInput");
+      const fringeTable = document.querySelector("#fringeTable");
+      const deltaXRepeatGrid = document.querySelector("#deltaXRepeatGrid");
+      const dCalcTable = document.querySelector("#dCalcTable");
+      const dValueCard = document.querySelector("#dValueCard");
+      const fitDeltaXValue = document.querySelector("#fitDeltaXValue");
+      const fitEquationText = document.querySelector("#fitEquationText");
+      const fitR2Value = document.querySelector("#fitR2Value");
+      const dAverageValue = document.querySelector("#dAverageValue");
+      const deltaXAverageValue = document.querySelector("#deltaXAverageValue");
+      const formulaSubText = document.querySelector("#formulaSubText");
+      const lambdaValue = document.querySelector("#lambdaValue");
+      const lambdaNote = document.querySelector("#lambdaNote");
+      const summaryValue = document.querySelector("#summaryValue");
+      const summaryList = document.querySelector("#summaryList");
+
+      function round(value, digits = 6) {
+        const factor = 10 ** digits;
+        return Math.round(value * factor) / factor;
+      }
+
+      function parseInputNumber(rawValue) {
+        if (rawValue === "") return Number.NaN;
+        return Number(rawValue);
+      }
+
+      function mean(values) {
+        if (!values.length) return 0;
+        return values.reduce((sum, value) => sum + value, 0) / values.length;
+      }
+
+      function linearFit(points) {
+        if (points.length < 2) return null;
+        const xAvg = mean(points.map((point) => point.x));
+        const yAvg = mean(points.map((point) => point.y));
+        const sxx = points.reduce((sum, point) => sum + (point.x - xAvg) ** 2, 0);
+        if (sxx === 0) return null;
+        const sxy = points.reduce((sum, point) => sum + (point.x - xAvg) * (point.y - yAvg), 0);
+        const slope = sxy / sxx;
+        const intercept = yAvg - slope * xAvg;
+        const ssTot = points.reduce((sum, point) => sum + (point.y - yAvg) ** 2, 0);
+        const ssRes = points.reduce((sum, point) => sum + (point.y - (slope * point.x + intercept)) ** 2, 0);
+        const r2 = ssTot === 0 ? 1 : 1 - ssRes / ssTot;
+        return { slope, intercept, r2, spacing: Math.abs(slope) };
+      }
+
+      function geometricMean(a, b) {
+        if (!(a > 0 && b > 0)) return 0;
+        return Math.sqrt(a * b);
+      }
+
+      function formatMm(value, digits = 5) {
+        return value > 0 ? `${value.toFixed(digits)} mm` : "--";
+      }
+
+      function formatM(value, digits = 5) {
+        return value > 0 ? `${value.toFixed(digits)} m` : "--";
+      }
+
+      function formatNm(value, digits = 2) {
+        return value > 0 ? `${value.toFixed(digits)} nm` : "--";
+      }
+
+      function getAdjacentSpacing(index) {
+        if (index === 0) return "--";
+        const current = state.fringeRows[index];
+        const previous = state.fringeRows[index - 1];
+        if (!Number.isFinite(current.k) || !Number.isFinite(previous.k)) return "--";
+        if (!Number.isFinite(current.x) || !Number.isFinite(previous.x)) return "--";
+        const orderGap = current.k - previous.k;
+        if (orderGap === 0) return "--";
+        return round((current.x - previous.x) / orderGap, 5);
+      }
+
+      function buildFringeTable() {
+        fringeTable.innerHTML = "";
+        state.fringeRows.forEach((row, index) => {
+          const tr = document.createElement("tr");
+          const spacing = getAdjacentSpacing(index);
+          tr.innerHTML = `
+            <td>${row.index}</td>
+            <td><input type="number" step="1" min="0" data-section="fringe-k" data-index="${index}" value="${Number.isFinite(row.k) ? row.k : ""}" /></td>
+            <td><input type="number" step="0.001" min="0" data-section="fringe-x" data-index="${index}" value="${Number.isFinite(row.x) ? row.x : ""}" /></td>
+            <td><span class="chip">${typeof spacing === "number" ? spacing.toFixed(5) : spacing}</span></td>
+          `;
+          fringeTable.append(tr);
+        });
+      }
+
+      function buildDeltaXGrid() {
+        deltaXRepeatGrid.innerHTML = "";
+        state.deltaXRows.forEach((value, index) => {
+          const label = document.createElement("label");
+          label.className = "field-card";
+          label.innerHTML = `
+            <span>Δx${index + 1} / mm</span>
+            <input type="number" step="0.001" min="0" data-section="delta-x" data-index="${index}" value="${Number.isFinite(value) ? value : ""}" />
+          `;
+          deltaXRepeatGrid.append(label);
+        });
+
+        const averageCard = document.createElement("div");
+        averageCard.className = "result-card blue average-card";
+        averageCard.innerHTML = `
+          <span>Δx 平均值</span>
+          <strong id="deltaXMeanCard">--</strong>
+          <p>这部分自动计算。</p>
+        `;
+        deltaXRepeatGrid.append(averageCard);
+      }
+
+      function buildDCalcTable() {
+        dCalcTable.innerHTML = "";
+        state.dRows.forEach((row, index) => {
+          const dValue = geometricMean(row.d1, row.d2);
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${row.index}</td>
+            <td><input type="number" step="0.001" min="0" data-section="d1" data-index="${index}" value="${Number.isFinite(row.d1) ? row.d1 : ""}" /></td>
+            <td><input type="number" step="0.001" min="0" data-section="d2" data-index="${index}" value="${Number.isFinite(row.d2) ? row.d2 : ""}" /></td>
+            <td><span class="chip">${dValue ? dValue.toFixed(5) : "--"}</span></td>
+          `;
+          dCalcTable.append(tr);
+        });
+      }
+
+      function updateFringeSpacingView() {
+        Array.from(fringeTable.children).forEach((rowElement, index) => {
+          const chip = rowElement.querySelector(".chip");
+          const spacing = getAdjacentSpacing(index);
+          chip.textContent = typeof spacing === "number" ? spacing.toFixed(5) : spacing;
+        });
+      }
+
+      function updateDCalcView() {
+        Array.from(dCalcTable.children).forEach((rowElement, index) => {
+          const chip = rowElement.querySelector(".chip");
+          const row = state.dRows[index];
+          const dValue = geometricMean(row.d1, row.d2);
+          chip.textContent = dValue ? dValue.toFixed(5) : "--";
+        });
+      }
+
+      function compute() {
+        const fringePoints = state.fringeRows
+          .filter((row) => Number.isFinite(row.k) && Number.isFinite(row.x))
+          .map((row) => ({ x: row.k, y: row.x }));
+        const fit = linearFit(fringePoints);
+        const fitDeltaX = fit ? fit.spacing : 0;
+        const deltaXMean = mean(state.deltaXRows.filter((value) => value > 0));
+        const dValues = state.dRows.map((row) => geometricMean(row.d1, row.d2)).filter((value) => value > 0);
+        const dMean = mean(dValues);
+        const usedDeltaX = deltaXMean || fitDeltaX;
+        const lambdaNm = state.D > 0 && dMean > 0 && usedDeltaX > 0
+          ? (usedDeltaX * dMean / (state.D * 1000)) * 1e6
+          : 0;
+        const percentError = lambdaNm > 0
+          ? Math.abs(lambdaNm - THEORETICAL_LAMBDA_NM) / THEORETICAL_LAMBDA_NM * 100
+          : 0;
+
+        return { fit, fitDeltaX, deltaXMean, dMean, usedDeltaX, lambdaNm, percentError };
+      }
+
+      function renderSummary() {
+        const result = compute();
+        const { fit, fitDeltaX, deltaXMean, dMean, usedDeltaX, lambdaNm, percentError } = result;
+        const deltaXMeanCard = document.querySelector("#deltaXMeanCard");
+
+        dInput.value = Number.isFinite(state.D) && state.D > 0 ? state.D : "";
+        dValueCard.textContent = formatM(state.D);
+        fitDeltaXValue.textContent = formatMm(fitDeltaX);
+        fitR2Value.textContent = fit ? fit.r2.toFixed(6) : "--";
+        fitEquationText.textContent = fit
+          ? `x = ${fit.slope.toFixed(5)}k + ${fit.intercept.toFixed(5)}`
+          : "请输入不少于 2 组有效条纹数据。";
+        if (deltaXMeanCard) {
+          deltaXMeanCard.textContent = formatMm(deltaXMean);
+        }
+        dAverageValue.textContent = formatMm(dMean);
+        deltaXAverageValue.textContent = formatMm(usedDeltaX);
+        formulaSubText.textContent = `当前代入：λ = (${dMean > 0 ? dMean.toFixed(5) : "--"} mm / ${state.D > 0 ? state.D.toFixed(5) : "--"} m) × ${usedDeltaX > 0 ? usedDeltaX.toFixed(5) : "--"} mm`;
+        lambdaValue.textContent = formatNm(lambdaNm);
+        lambdaNote.textContent = lambdaNm > 0
+          ? `理论值 ${THEORETICAL_LAMBDA_NM.toFixed(1)} nm，误差 ${percentError.toFixed(2)}%。`
+          : `理论值 ${THEORETICAL_LAMBDA_NM.toFixed(1)} nm。`;
+        summaryValue.textContent = state.D > 0 && usedDeltaX > 0 && dMean > 0
+          ? `D=${state.D.toFixed(5)} m`
+          : "--";
+
+        summaryList.innerHTML = [
+          `D 的录入值：${state.D > 0 ? `${state.D.toFixed(5)} m` : "待录入"}`,
+          fitDeltaX > 0 ? `线性拟合结果：Δx = ${fitDeltaX.toFixed(5)} mm。` : "线性拟合结果尚未形成有效数值。",
+          deltaXMean > 0 ? `五组重复测量平均值：Δx = ${deltaXMean.toFixed(5)} mm。` : "五组 Δx 平均值尚未形成有效数值。",
+          dMean > 0 ? `五组 d 的平均值：d = ${dMean.toFixed(5)} mm。` : "d 的平均值尚未形成有效数值。",
+          usedDeltaX > 0 ? `公式代入采用：Δx = ${usedDeltaX.toFixed(5)} mm。` : "当前尚无可用于公式代入的 Δx 数值。",
+          lambdaNm > 0 ? `计算结果：λ = ${lambdaNm.toFixed(2)} nm。` : "当前条件下尚不能完成 λ 的计算，请继续录入相关数据。",
+        ].map((text) => `<div class="summary-item">${text}</div>`).join("");
+      }
+
+      function renderAll() {
+        buildFringeTable();
+        buildDeltaXGrid();
+        buildDCalcTable();
+        renderSummary();
+      }
+
+      function resetExample() {
+        Object.assign(state, structuredClone(DEFAULT_STATE));
+        renderAll();
+      }
+
+      function clearAll() {
+        state.D = Number.NaN;
+        state.fringeRows = Array.from({ length: 10 }, (_, index) => ({
+          index: index + 1,
+          k: index,
+          x: Number.NaN,
+        }));
+        state.deltaXRows = [Number.NaN, Number.NaN, Number.NaN, Number.NaN, Number.NaN];
+        state.dRows = Array.from({ length: 5 }, (_, index) => ({
+          index: index + 1,
+          d1: Number.NaN,
+          d2: Number.NaN,
+        }));
+        renderAll();
+      }
+
+      document.addEventListener("input", (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLInputElement)) return;
+        const index = Number(target.dataset.index ?? -1);
+        const value = parseInputNumber(target.value);
+
+        switch (target.dataset.section) {
+          case "fringe-k":
+            if (index >= 0) state.fringeRows[index].k = value;
+            updateFringeSpacingView();
+            break;
+          case "fringe-x":
+            if (index >= 0) state.fringeRows[index].x = value;
+            updateFringeSpacingView();
+            break;
+          case "delta-x":
+            if (index >= 0) state.deltaXRows[index] = value;
+            break;
+          case "d1":
+            if (index >= 0) state.dRows[index].d1 = value;
+            updateDCalcView();
+            break;
+          case "d2":
+            if (index >= 0) state.dRows[index].d2 = value;
+            updateDCalcView();
+            break;
+          default:
+            return;
+        }
+
+        renderSummary();
+      });
+
+      dInput.addEventListener("input", () => {
+        state.D = parseInputNumber(dInput.value);
+        renderSummary();
+      });
+
+      document.querySelector("#fillExampleBtn").addEventListener("click", resetExample);
+      document.querySelector("#clearBtn").addEventListener("click", clearAll);
+
+      renderAll();
+    </script>
+  </body>
+</html>

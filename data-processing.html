@@ -1,0 +1,843 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>双棱镜干涉数据处理</title>
+    <style>
+      :root {
+        --bg-1: #f4f1e8;
+        --bg-2: #d7e2ea;
+        --panel: rgba(255, 252, 247, 0.9);
+        --panel-strong: rgba(255, 255, 255, 0.95);
+        --line: rgba(29, 50, 66, 0.14);
+        --text: #193041;
+        --muted: #607687;
+        --accent: #bd5a2b;
+        --sky: #2a78a0;
+        --success: #1e7b58;
+        --shadow: 0 24px 58px rgba(25, 48, 65, 0.12);
+        --radius: 26px;
+        font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, rgba(255, 255, 255, 0.85), transparent 28%),
+          linear-gradient(160deg, var(--bg-1), var(--bg-2));
+      }
+
+      * { box-sizing: border-box; }
+      html, body { margin: 0; min-height: 100%; }
+      body { min-height: 100vh; }
+      button, input, table { font: inherit; }
+      button { cursor: pointer; }
+      input {
+        width: 100%;
+        border: 1px solid rgba(29, 50, 66, 0.16);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.88);
+        padding: 11px 12px;
+        color: var(--text);
+      }
+      input:focus {
+        outline: none;
+        border-color: rgba(42, 120, 160, 0.5);
+        box-shadow: 0 0 0 4px rgba(42, 120, 160, 0.12);
+      }
+      #app { min-height: 100vh; }
+      .page-shell { width: min(1460px, 100%); margin: 0 auto; padding: 22px; }
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+        gap: 18px;
+        align-items: stretch;
+        margin-bottom: 20px;
+      }
+      .hero > div:first-child, .hero-card, .panel {
+        border-radius: var(--radius);
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow);
+      }
+      .hero > div:first-child {
+        padding: 28px 30px;
+        background: linear-gradient(135deg, rgba(255, 251, 244, 0.96), rgba(244, 249, 252, 0.88));
+      }
+      .eyebrow {
+        margin: 0 0 10px;
+        color: var(--sky);
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        font-size: 12px;
+        font-weight: 800;
+      }
+      h1, h2, h3, h4, p { margin: 0; }
+      h1 { font-size: clamp(30px, 3vw, 44px); line-height: 1.04; letter-spacing: -0.04em; }
+      h2 { font-size: 24px; line-height: 1.12; }
+      h3 { font-size: 18px; }
+      h4 { font-size: 16px; }
+      .hero-copy, .subpanel-head p {
+        margin-top: 14px;
+        color: var(--muted);
+        line-height: 1.72;
+        font-size: 15px;
+      }
+      .hero-card {
+        padding: 22px;
+        background: linear-gradient(180deg, rgba(17, 31, 44, 0.96), rgba(18, 44, 62, 0.92));
+        display: grid;
+        gap: 14px;
+      }
+      .hero-card div {
+        border-radius: 18px;
+        padding: 14px 16px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(216, 230, 239, 0.12);
+      }
+      .hero-card span {
+        display: block;
+        margin-bottom: 6px;
+        color: #95afc1;
+        font-size: 13px;
+      }
+      .hero-card strong {
+        color: #f7fbff;
+        font-size: 22px;
+        font-weight: 800;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(400px, 520px);
+        gap: 20px;
+        align-items: start;
+      }
+      .panel { padding: 20px; background: var(--panel); }
+      .panel-form { display: grid; gap: 18px; }
+      .panel-result { position: sticky; top: 18px; display: grid; gap: 18px; background: var(--panel-strong); }
+      .panel-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: flex-start;
+      }
+      .action-row { display: flex; gap: 10px; flex-wrap: wrap; }
+      .ghost-btn {
+        border: 1px solid rgba(29, 50, 66, 0.14);
+        background: rgba(255, 255, 255, 0.72);
+        color: var(--text);
+        border-radius: 999px;
+        padding: 10px 14px;
+        font-weight: 700;
+      }
+      .status-pill {
+        align-self: center;
+        border-radius: 999px;
+        padding: 10px 14px;
+        background: rgba(29, 50, 66, 0.08);
+        color: var(--muted);
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .status-pill.ready {
+        background: rgba(30, 123, 88, 0.13);
+        color: var(--success);
+      }
+      .subpanel {
+        padding: 18px;
+        border-radius: 22px;
+        border: 1px solid rgba(29, 50, 66, 0.08);
+        background: rgba(255, 255, 255, 0.52);
+      }
+      .subpanel.dark {
+        background: linear-gradient(180deg, rgba(14, 28, 41, 0.98), rgba(15, 39, 56, 0.94));
+        border-color: rgba(204, 222, 235, 0.08);
+      }
+      .subpanel.dark h3, .subpanel.dark p { color: #eef5fa; }
+      .subpanel.dark .subpanel-head p { color: #a8bccb; }
+      .subpanel-head { margin-bottom: 14px; }
+      .mini-grid, .instrument-grid, .stats-grid, .result-hero, .repeat-grid { display: grid; gap: 12px; }
+      .mini-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .repeat-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+      .mini-card, .instrument-grid label, .repeat-card { display: grid; gap: 8px; }
+      .mini-card span, .instrument-grid span, .repeat-card span { font-size: 14px; font-weight: 700; color: var(--text); }
+      .table-wrap { overflow-x: auto; }
+      .data-table { width: 100%; border-collapse: collapse; min-width: 640px; }
+      .data-table th, .data-table td {
+        padding: 12px 10px;
+        border-bottom: 1px solid rgba(29, 50, 66, 0.08);
+        text-align: left;
+      }
+      .data-table th { color: var(--muted); font-size: 13px; font-weight: 800; }
+      .derived-chip {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        border-radius: 999px;
+        padding: 0 12px;
+        background: rgba(42, 120, 160, 0.1);
+        color: var(--sky);
+        font-weight: 800;
+      }
+      .instrument-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .result-hero { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .metric-card, .stat-card, .summary-item {
+        border-radius: 22px;
+        border: 1px solid rgba(29, 50, 66, 0.08);
+        background: rgba(255, 255, 255, 0.7);
+        padding: 16px;
+      }
+      .metric-card { display: grid; gap: 8px; }
+      .metric-card span, .stat-card div span { color: var(--muted); font-size: 14px; }
+      .metric-card strong { font-size: 28px; line-height: 1.04; }
+      .metric-card em {
+        font-style: normal;
+        color: var(--muted);
+        line-height: 1.55;
+        font-size: 13px;
+      }
+      .metric-card.accent {
+        background: linear-gradient(180deg, rgba(255, 244, 236, 0.96), rgba(255, 255, 255, 0.82));
+        border-color: rgba(189, 90, 43, 0.16);
+      }
+      .metric-card.accent-soft {
+        background: linear-gradient(180deg, rgba(236, 248, 255, 0.96), rgba(255, 255, 255, 0.86));
+        border-color: rgba(42, 120, 160, 0.18);
+      }
+      .chart-shell { border-radius: 22px; overflow: hidden; border: 1px solid rgba(204, 222, 235, 0.08); }
+      #fitChart { width: 100%; height: auto; display: block; }
+      .equation-box {
+        display: grid;
+        gap: 8px;
+        margin-top: 12px;
+        border-radius: 18px;
+        padding: 14px 16px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(212, 226, 236, 0.1);
+        color: #edf6fc;
+      }
+      .equation-line { line-height: 1.65; }
+      .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .stat-card { display: grid; gap: 10px; }
+      .stat-card div {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 0;
+        border-top: 1px dashed rgba(29, 50, 66, 0.1);
+      }
+      .stat-card div:first-of-type { border-top: 0; }
+      .stat-card strong { color: var(--text); }
+      .stat-card.emphasis {
+        background: linear-gradient(180deg, rgba(255, 247, 233, 0.96), rgba(255, 255, 255, 0.84));
+        border-color: rgba(189, 90, 43, 0.18);
+      }
+      .summary-list { display: grid; gap: 10px; }
+      .summary-item { line-height: 1.68; color: var(--text); }
+      @media (max-width: 1180px) {
+        .layout { grid-template-columns: 1fr; }
+        .panel-result { position: static; }
+      }
+      @media (max-width: 920px) {
+        .hero { grid-template-columns: 1fr; }
+        .mini-grid, .instrument-grid, .stats-grid, .result-hero, .repeat-grid { grid-template-columns: 1fr; }
+      }
+      @media (max-width: 720px) {
+        .page-shell { padding: 12px; }
+        .panel-head { flex-direction: column; align-items: stretch; }
+        .action-row { width: 100%; }
+        .ghost-btn { flex: 1; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script>
+      const THEORETICAL_LAMBDA_NM = 589.3;
+      const DEFAULT_D_INSTRUMENT_MM = 0.01;
+      const DEFAULT_D_DISTANCE_INSTRUMENT_MM = 0.01;
+      const DEFAULT_D_READINGS_M = [0.671, 0.673, 0.672];
+      const DEFAULT_FRINGE_ROWS = Array.from({ length: 10 }, (_, index) => ({
+        index: index + 1,
+        fringeOrder: index,
+        positionMm: Number((12.116 + index * 0.6244 + [0, 0.006, -0.004, 0.005, -0.003, 0.004, -0.005, 0.003, -0.004, 0.002][index]).toFixed(3)),
+      }));
+      const DEFAULT_DELTA_X_REPEAT_MM = [0.624, 0.627, 0.623, 0.626, 0.625];
+      const DEFAULT_IMAGE_ROWS = [
+        { index: 1, d1Mm: 2.486, d2Mm: 0.651 },
+        { index: 2, d1Mm: 2.481, d2Mm: 0.649 },
+        { index: 3, d1Mm: 2.484, d2Mm: 0.650 },
+      ];
+
+      const app = document.querySelector('#app');
+      const state = {
+        dRows: structuredClone(DEFAULT_D_READINGS_M),
+        fringeRows: structuredClone(DEFAULT_FRINGE_ROWS),
+        deltaXRepeatRows: structuredClone(DEFAULT_DELTA_X_REPEAT_MM),
+        imageRows: structuredClone(DEFAULT_IMAGE_ROWS),
+        dInstrumentMm: DEFAULT_D_INSTRUMENT_MM,
+        dDistanceInstrumentMm: DEFAULT_D_DISTANCE_INSTRUMENT_MM,
+      };
+
+      app.innerHTML = `
+        <div class="page-shell">
+          <header class="hero">
+            <div>
+              <p class="eyebrow">Learning by Doing</p>
+              <h1>双棱镜干涉数据处理小程序</h1>
+              <p class="hero-copy">
+                按“每隔一个条纹测一组”的方式录入 10 组数据，页面内直接做线性拟合，
+                自动计算条纹间距、虚光源间距、波长与不确定度，适合放到学习通中直接使用。
+              </p>
+            </div>
+            <div class="hero-card">
+              <div><span>理论波长</span><strong>${THEORETICAL_LAMBDA_NM.toFixed(1)} nm</strong></div>
+              <div><span>条纹测量</span><strong>10 组</strong></div>
+              <div><span>拟合方式</span><strong>x-k 线性拟合</strong></div>
+            </div>
+          </header>
+
+          <main class="layout">
+            <section class="panel panel-form">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Input</p>
+                  <h2>实验数据录入</h2>
+                </div>
+                <div class="action-row">
+                  <button id="fillExampleBtn" type="button" class="ghost-btn">填入示例</button>
+                  <button id="clearBtn" type="button" class="ghost-btn">清空数据</button>
+                </div>
+              </div>
+
+              <section class="subpanel">
+                <div class="subpanel-head">
+                  <h3>1. 观测距离 D（m）</h3>
+                  <p>可录入多次读数，自动取平均值参与计算。</p>
+                </div>
+                <div class="mini-grid" id="dTable"></div>
+              </section>
+
+              <section class="subpanel">
+                <div class="subpanel-head">
+                  <h3>2. 条纹位置数据</h3>
+                  <p>最小二乘拟合使用 0-9 共 10 个条纹编号，输入对应位置 x（mm）。</p>
+                </div>
+                <div class="table-wrap">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>组次</th>
+                        <th>条纹序号 k</th>
+                        <th>位置 x / mm</th>
+                        <th>相邻组条纹间距 Δx / mm</th>
+                      </tr>
+                    </thead>
+                    <tbody id="fringeTable"></tbody>
+                  </table>
+                </div>
+              </section>
+
+              <section class="subpanel">
+                <div class="subpanel-head">
+                  <h3>3. Δx 五组重复测量</h3>
+                  <p>这里单独填写 5 组十个条纹间距测得的 Δx，用于取平均值并计算不确定度。</p>
+                </div>
+                <div class="repeat-grid" id="deltaXRepeatTable"></div>
+              </section>
+
+              <section class="subpanel">
+                <div class="subpanel-head">
+                  <h3>4. 辅助透镜读数</h3>
+                  <p>输入放大像间距 d1 与缩小像间距 d2，程序自动计算 d = √(d1·d2)。</p>
+                </div>
+                <div class="table-wrap">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>组次</th>
+                        <th>d1 / mm</th>
+                        <th>d2 / mm</th>
+                        <th>d / mm</th>
+                      </tr>
+                    </thead>
+                    <tbody id="imageTable"></tbody>
+                  </table>
+                </div>
+              </section>
+
+              <section class="subpanel">
+                <div class="subpanel-head">
+                  <h3>5. 仪器分度值</h3>
+                  <p>默认按公式.doc 中的 B 类处理方式：uB = Δ仪 / √3。</p>
+                </div>
+                <div class="instrument-grid">
+                  <label>
+                    <span>d、Δx 仪器分度值 / mm</span>
+                    <input id="dInstrumentInput" type="number" step="0.001" min="0" />
+                  </label>
+                  <label>
+                    <span>D 仪器分度值 / mm</span>
+                    <input id="distanceInstrumentInput" type="number" step="0.001" min="0" />
+                  </label>
+                </div>
+              </section>
+            </section>
+
+            <section class="panel panel-result">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Output</p>
+                  <h2>拟合与计算结果</h2>
+                </div>
+                <span class="status-pill" id="fitBadge">等待数据</span>
+              </div>
+
+              <section class="result-hero" id="coreResult"></section>
+
+              <section class="subpanel dark">
+                <div class="subpanel-head">
+                  <h3>线性拟合图</h3>
+                  <p>横轴为条纹序号 k，纵轴为位置 x（mm），斜率直接对应条纹间距 Δx。</p>
+                </div>
+                <div class="chart-shell">
+                  <svg id="fitChart" viewBox="0 0 700 420" role="img" aria-label="线性拟合图"></svg>
+                </div>
+                <div class="equation-box" id="fitEquation"></div>
+              </section>
+
+              <section class="subpanel">
+                <div class="subpanel-head">
+                  <h3>不确定度分析</h3>
+                  <p>按公式.doc 中的 A 类、B 类与合成相对不确定度方式自动计算。</p>
+                </div>
+                <div class="stats-grid" id="uncertaintyGrid"></div>
+              </section>
+
+              <section class="subpanel">
+                <div class="subpanel-head">
+                  <h3>计算过程摘要</h3>
+                  <p>方便学生截图提交，也方便老师核对过程。</p>
+                </div>
+                <div class="summary-list" id="summaryList"></div>
+              </section>
+            </section>
+          </main>
+        </div>
+      `;
+
+      const dTable = document.querySelector('#dTable');
+      const fringeTable = document.querySelector('#fringeTable');
+      const deltaXRepeatTable = document.querySelector('#deltaXRepeatTable');
+      const imageTable = document.querySelector('#imageTable');
+      const coreResult = document.querySelector('#coreResult');
+      const fitEquation = document.querySelector('#fitEquation');
+      const uncertaintyGrid = document.querySelector('#uncertaintyGrid');
+      const summaryList = document.querySelector('#summaryList');
+      const fitBadge = document.querySelector('#fitBadge');
+      const fitChart = document.querySelector('#fitChart');
+      const dInstrumentInput = document.querySelector('#dInstrumentInput');
+      const distanceInstrumentInput = document.querySelector('#distanceInstrumentInput');
+
+      function round(value, digits = 6) {
+        const factor = 10 ** digits;
+        return Math.round(value * factor) / factor;
+      }
+
+      function mean(values) {
+        if (!values.length) return 0;
+        return values.reduce((sum, value) => sum + value, 0) / values.length;
+      }
+
+      function sampleAUncertainty(values) {
+        const n = values.length;
+        if (n < 2) return 0;
+        const avg = mean(values);
+        const sum = values.reduce((total, value) => total + (value - avg) ** 2, 0);
+        return Math.sqrt(sum / (n * (n - 1)));
+      }
+
+      function bUncertaintyFromResolution(resolution) {
+        return resolution > 0 ? resolution / Math.sqrt(3) : 0;
+      }
+
+      function combineUncertainty(aValue, bValue) {
+        return Math.sqrt(aValue ** 2 + bValue ** 2);
+      }
+
+      function stats(values, resolution) {
+        const avg = mean(values);
+        const aUncertainty = sampleAUncertainty(values);
+        const bUncertainty = bUncertaintyFromResolution(resolution);
+        const combined = combineUncertainty(aUncertainty, bUncertainty);
+        return { mean: avg, aUncertainty, bUncertainty, combined };
+      }
+
+      function linearFit(points) {
+        if (points.length < 2) return null;
+        const xs = points.map((point) => point.x);
+        const ys = points.map((point) => point.y);
+        const xAvg = mean(xs);
+        const yAvg = mean(ys);
+        const sxx = xs.reduce((sum, value) => sum + (value - xAvg) ** 2, 0);
+        if (sxx === 0) return null;
+        const sxy = points.reduce((sum, point) => sum + (point.x - xAvg) * (point.y - yAvg), 0);
+        const slope = sxy / sxx;
+        const intercept = yAvg - slope * xAvg;
+        const predicted = xs.map((x) => slope * x + intercept);
+        const ssTot = ys.reduce((sum, value) => sum + (value - yAvg) ** 2, 0);
+        const ssRes = ys.reduce((sum, value, index) => sum + (value - predicted[index]) ** 2, 0);
+        const r2 = ssTot === 0 ? 1 : 1 - ssRes / ssTot;
+        return { slope, intercept, r2, predicted, spacingMm: Math.abs(slope) };
+      }
+
+      function geometricMean(d1Mm, d2Mm) {
+        if (d1Mm <= 0 || d2Mm <= 0) return 0;
+        return Math.sqrt(d1Mm * d2Mm);
+      }
+
+      function relativePart(uncertainty, value) {
+        return value === 0 ? 0 : uncertainty / Math.abs(value);
+      }
+
+      function parseInputNumber(rawValue) {
+        if (rawValue === '') return Number.NaN;
+        return Number(rawValue);
+      }
+
+      function createInput(value, step, dataset) {
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.value = Number.isFinite(value) ? String(value) : '';
+        input.step = step;
+        input.min = '0';
+        Object.entries(dataset).forEach(([key, dataValue]) => {
+          input.dataset[key] = dataValue;
+        });
+        return input;
+      }
+
+      function getFringeSpacing(index) {
+        if (index === 0) return '--';
+        const currentRow = state.fringeRows[index];
+        const previousRow = state.fringeRows[index - 1];
+        if (!Number.isFinite(currentRow.positionMm) || !Number.isFinite(previousRow.positionMm)) return '--';
+        if (!Number.isFinite(currentRow.fringeOrder) || !Number.isFinite(previousRow.fringeOrder)) return '--';
+        const orderGap = currentRow.fringeOrder - previousRow.fringeOrder;
+        if (orderGap === 0) return '--';
+        return round((currentRow.positionMm - previousRow.positionMm) / orderGap, 5);
+      }
+
+      function setChipText(chip, value, digits = 5) {
+        if (!chip) return;
+        chip.textContent = typeof value === 'number' && Number.isFinite(value) ? value.toFixed(digits) : '--';
+      }
+
+      function renderDTable() {
+        dTable.innerHTML = '';
+        state.dRows.forEach((value, index) => {
+          const card = document.createElement('label');
+          card.className = 'mini-card';
+          const title = document.createElement('span');
+          title.textContent = `D${index + 1} / m`;
+          const input = createInput(value, '0.001', { section: 'd', index: String(index) });
+          card.append(title, input);
+          dTable.append(card);
+        });
+      }
+
+      function renderFringeTable() {
+        fringeTable.innerHTML = '';
+        state.fringeRows.forEach((row, index) => {
+          const tr = document.createElement('tr');
+          tr.dataset.index = String(index);
+          const spacing = getFringeSpacing(index);
+          tr.innerHTML = `
+            <td>${row.index}</td>
+            <td></td>
+            <td></td>
+            <td><span class="derived-chip">${typeof spacing === 'number' ? spacing.toFixed(5) : spacing}</span></td>
+          `;
+          const orderInput = createInput(row.fringeOrder, '1', { section: 'fringe-order', index: String(index) });
+          orderInput.min = '0';
+          orderInput.max = '9';
+          tr.children[1].append(orderInput);
+          tr.children[2].append(createInput(row.positionMm, '0.001', { section: 'fringe-position', index: String(index) }));
+          fringeTable.append(tr);
+        });
+      }
+
+      function renderDeltaXRepeatTable() {
+        deltaXRepeatTable.innerHTML = '';
+        state.deltaXRepeatRows.forEach((value, index) => {
+          const card = document.createElement('label');
+          card.className = 'repeat-card';
+          const title = document.createElement('span');
+          title.textContent = `Δx${index + 1} / mm`;
+          const input = createInput(value, '0.001', { section: 'delta-x-repeat', index: String(index) });
+          card.append(title, input);
+          deltaXRepeatTable.append(card);
+        });
+      }
+
+      function updateFringeSpacingCells() {
+        Array.from(fringeTable.children).forEach((rowElement, index) => {
+          const chip = rowElement.querySelector('.derived-chip');
+          setChipText(chip, getFringeSpacing(index));
+        });
+      }
+
+      function renderImageTable() {
+        imageTable.innerHTML = '';
+        state.imageRows.forEach((row, index) => {
+          const tr = document.createElement('tr');
+          tr.dataset.index = String(index);
+          const dMm = geometricMean(row.d1Mm, row.d2Mm);
+          tr.innerHTML = `
+            <td>${row.index}</td>
+            <td></td>
+            <td></td>
+            <td><span class="derived-chip">${dMm ? dMm.toFixed(5) : '--'}</span></td>
+          `;
+          tr.children[1].append(createInput(row.d1Mm, '0.001', { section: 'image-d1', index: String(index) }));
+          tr.children[2].append(createInput(row.d2Mm, '0.001', { section: 'image-d2', index: String(index) }));
+          imageTable.append(tr);
+        });
+      }
+
+      function updateImageDerivedCells() {
+        Array.from(imageTable.children).forEach((rowElement, index) => {
+          const chip = rowElement.querySelector('.derived-chip');
+          const row = state.imageRows[index];
+          setChipText(chip, geometricMean(row.d1Mm, row.d2Mm));
+        });
+      }
+
+      function formatLambda(lambdaNm, uLambdaNm) {
+        if (!Number.isFinite(lambdaNm) || lambdaNm <= 0) return '--';
+        if (!Number.isFinite(uLambdaNm) || uLambdaNm <= 0) return `${lambdaNm.toFixed(2)} nm`;
+        return `${lambdaNm.toFixed(2)} ± ${uLambdaNm.toFixed(2)} nm`;
+      }
+
+      function drawFitChart(points, fit) {
+        const width = 700;
+        const height = 420;
+        const padding = { left: 72, right: 28, top: 28, bottom: 56 };
+        fitChart.innerHTML = '';
+        if (!(fit && points.length >= 2)) {
+          fitChart.innerHTML = `
+            <rect x="0" y="0" width="${width}" height="${height}" rx="24" fill="#0c1721" />
+            <text x="${width / 2}" y="${height / 2}" fill="#dfe8ef" text-anchor="middle" font-size="26">录入有效数据后显示拟合图</text>
+          `;
+          return;
+        }
+
+        const xs = points.map((point) => point.x);
+        const ys = points.map((point) => point.y);
+        const minX = Math.min(...xs);
+        const maxX = Math.max(...xs);
+        const minY = Math.min(...ys);
+        const maxY = Math.max(...ys);
+        const xSpan = maxX - minX || 1;
+        const ySpan = maxY - minY || 1;
+        const toX = (value) => padding.left + ((value - minX) / xSpan) * (width - padding.left - padding.right);
+        const toY = (value) => height - padding.bottom - ((value - minY) / ySpan) * (height - padding.top - padding.bottom);
+        const gridLines = Array.from({ length: 5 }, (_, index) => {
+          const y = padding.top + ((height - padding.top - padding.bottom) / 4) * index;
+          return `<line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="rgba(187,208,224,0.12)" stroke-width="1" />`;
+        }).join('');
+        const xTicks = xs.map((value) => `<text x="${toX(value)}" y="${height - 18}" fill="#8ea4b4" font-size="15" text-anchor="middle">${value}</text>`).join('');
+        const yTicks = Array.from({ length: 5 }, (_, index) => {
+          const value = maxY - (ySpan / 4) * index;
+          return `<text x="${padding.left - 14}" y="${padding.top + ((height - padding.top - padding.bottom) / 4) * index + 5}" fill="#8ea4b4" font-size="15" text-anchor="end">${value.toFixed(3)}</text>`;
+        }).join('');
+        const pathPoints = [minX, maxX].map((x, index) => `${index === 0 ? 'M' : 'L'} ${toX(x)} ${toY(fit.slope * x + fit.intercept)}`).join(' ');
+        const dots = points.map((point) => `
+          <circle cx="${toX(point.x)}" cy="${toY(point.y)}" r="6" fill="#ffd777" />
+          <circle cx="${toX(point.x)}" cy="${toY(point.y)}" r="13" fill="rgba(255,215,119,0.14)" />
+        `).join('');
+
+        fitChart.innerHTML = `
+          <rect x="0" y="0" width="${width}" height="${height}" rx="24" fill="#0c1721" />
+          ${gridLines}
+          <line x1="${padding.left}" y1="${height - padding.bottom}" x2="${width - padding.right}" y2="${height - padding.bottom}" stroke="#91a8b9" stroke-width="2" />
+          <line x1="${padding.left}" y1="${padding.top}" x2="${padding.left}" y2="${height - padding.bottom}" stroke="#91a8b9" stroke-width="2" />
+          <path d="${pathPoints}" fill="none" stroke="#78d0ff" stroke-width="4" stroke-linecap="round" />
+          ${dots}
+          ${xTicks}
+          ${yTicks}
+          <text x="${width / 2}" y="${height - 10}" fill="#d6e2eb" font-size="16" text-anchor="middle">条纹序号 k</text>
+          <text x="26" y="${height / 2}" fill="#d6e2eb" font-size="16" text-anchor="middle" transform="rotate(-90 26 ${height / 2})">位置 x / mm</text>
+        `;
+      }
+
+      function compute() {
+        const fringePoints = state.fringeRows.filter((row) => Number.isFinite(row.fringeOrder) && Number.isFinite(row.positionMm)).map((row) => ({ x: row.fringeOrder, y: row.positionMm }));
+        const fit = linearFit(fringePoints);
+        const fittedDeltaX = fit ? fit.spacingMm : 0;
+        const dStats = stats(state.dRows.filter((value) => value > 0), state.dDistanceInstrumentMm / 1000);
+        const deltaXStats = stats(state.deltaXRepeatRows.filter((value) => value > 0), state.dInstrumentMm);
+        const dValuesMm = state.imageRows.map((row) => geometricMean(row.d1Mm, row.d2Mm)).filter((value) => value > 0);
+        const virtualSourceStats = stats(dValuesMm, state.dInstrumentMm);
+        const deltaXForLambda = deltaXStats.mean || fittedDeltaX;
+        const lambdaNm = dStats.mean > 0 && deltaXForLambda > 0 && virtualSourceStats.mean > 0 ? (deltaXForLambda * virtualSourceStats.mean / (dStats.mean * 1000)) * 1e6 : 0;
+        const relativeUncertainty = Math.sqrt(
+          relativePart(deltaXStats.combined, deltaXForLambda) ** 2 +
+          relativePart(dStats.combined, dStats.mean) ** 2 +
+          relativePart(virtualSourceStats.combined, virtualSourceStats.mean) ** 2
+        );
+        const uLambdaNm = lambdaNm * relativeUncertainty;
+        const percentError = lambdaNm ? Math.abs(lambdaNm - THEORETICAL_LAMBDA_NM) / THEORETICAL_LAMBDA_NM * 100 : 0;
+        return {
+          fringePoints, fit, fittedDeltaX, deltaXStats, dStats,
+          deltaXForLambda,
+          virtualSourceStats, lambdaNm, uLambdaNm, relativeUncertainty, percentError
+        };
+      }
+
+      function renderResults() {
+        const result = compute();
+        const { fit, fringePoints, fittedDeltaX, deltaXStats, deltaXForLambda, lambdaNm, uLambdaNm, relativeUncertainty, percentError, dStats, virtualSourceStats } = result;
+        const fitReady = Boolean(fit && fringePoints.length >= 2);
+        fitBadge.textContent = fitReady ? '拟合完成' : '等待有效数据';
+        fitBadge.classList.toggle('ready', fitReady);
+
+        coreResult.innerHTML = `
+          <article class="metric-card accent">
+            <span>拟合得到 Δx</span>
+            <strong>${fittedDeltaX ? fittedDeltaX.toFixed(5) : '--'} mm</strong>
+            <em>随条纹位置数据实时变化；五组平均 Δx = ${deltaXStats.mean ? deltaXStats.mean.toFixed(5) : '--'} mm</em>
+          </article>
+          <article class="metric-card">
+            <span>虚光源间距 d</span>
+            <strong>${virtualSourceStats.mean ? virtualSourceStats.mean.toFixed(5) : '--'} mm</strong>
+            <em>d = √(d1·d2) 后再取平均</em>
+          </article>
+          <article class="metric-card">
+            <span>平均 D</span>
+            <strong>${dStats.mean ? dStats.mean.toFixed(5) : '--'} m</strong>
+            <em>多次读数平均值</em>
+          </article>
+          <article class="metric-card accent-soft">
+            <span>测得波长 λ</span>
+            <strong>${formatLambda(lambdaNm, uLambdaNm)}</strong>
+            <em>理论值 ${THEORETICAL_LAMBDA_NM.toFixed(1)} nm，误差 ${percentError ? percentError.toFixed(2) : '--'}%</em>
+          </article>
+        `;
+
+        fitEquation.innerHTML = fit ? `
+          <div class="equation-line">拟合方程：<strong>x = ${fit.slope.toFixed(5)}k + ${fit.intercept.toFixed(5)}</strong></div>
+          <div class="equation-line">决定系数：<strong>R² = ${fit.r2.toFixed(6)}</strong></div>
+          <div class="equation-line">本次拟合得到：<strong>Δx = ${fittedDeltaX.toFixed(5)} mm</strong></div>
+          <div class="equation-line">波长计算取值：<strong>Δx = ${deltaXForLambda ? deltaXForLambda.toFixed(5) : '--'} mm</strong></div>
+        ` : '<div class="equation-line">请至少输入 2 组有效条纹数据。</div>';
+
+        uncertaintyGrid.innerHTML = `
+          <article class="stat-card">
+            <h4>D 的不确定度</h4>
+            <div><span>uA(D)</span><strong>${dStats.aUncertainty.toFixed(6)} m</strong></div>
+            <div><span>uB(D)</span><strong>${dStats.bUncertainty.toFixed(6)} m</strong></div>
+            <div><span>u(D)</span><strong>${dStats.combined.toFixed(6)} m</strong></div>
+          </article>
+          <article class="stat-card">
+            <h4>Δx（五组重复测量）的不确定度</h4>
+            <div><span>Δx 平均值</span><strong>${deltaXStats.mean ? deltaXStats.mean.toFixed(6) : '--'} mm</strong></div>
+            <div><span>uA(Δx)</span><strong>${deltaXStats.aUncertainty.toFixed(6)} mm</strong></div>
+            <div><span>uB(Δx)</span><strong>${deltaXStats.bUncertainty.toFixed(6)} mm</strong></div>
+            <div><span>u(Δx)</span><strong>${deltaXStats.combined.toFixed(6)} mm</strong></div>
+          </article>
+          <article class="stat-card">
+            <h4>d 的不确定度</h4>
+            <div><span>uA(d)</span><strong>${virtualSourceStats.aUncertainty.toFixed(6)} mm</strong></div>
+            <div><span>uB(d)</span><strong>${virtualSourceStats.bUncertainty.toFixed(6)} mm</strong></div>
+            <div><span>u(d)</span><strong>${virtualSourceStats.combined.toFixed(6)} mm</strong></div>
+          </article>
+          <article class="stat-card emphasis">
+            <h4>波长结果</h4>
+            <div><span>ur</span><strong>${(relativeUncertainty * 100).toFixed(2)}%</strong></div>
+            <div><span>uλ</span><strong>${uLambdaNm.toFixed(4)} nm</strong></div>
+            <div><span>λ</span><strong>${formatLambda(lambdaNm, uLambdaNm)}</strong></div>
+          </article>
+        `;
+
+        summaryList.innerHTML = [
+          '最小二乘拟合使用 0-9 共 10 个条纹编号：条纹序号 k 与位置 x 建立直线关系。',
+          fit ? `拟合得到本次 Δx = ${fittedDeltaX.toFixed(5)} mm。` : '等待条纹拟合结果。',
+          deltaXStats.mean ? `另外输入 5 组 Δx 重复测量，平均 Δx = ${deltaXStats.mean.toFixed(5)} mm，并据此计算不确定度。` : '等待 Δx 五组重复测量数据。',
+          virtualSourceStats.mean ? `虚光源间距按 d = √(d1·d2) 逐组计算，平均 d = ${virtualSourceStats.mean.toFixed(5)} mm。` : '等待 d1、d2 数据。',
+          dStats.mean ? `观测距离平均值 D = ${dStats.mean.toFixed(5)} m。` : '等待 D 数据。',
+          lambdaNm ? `代入 λ = Δx·d / D，得到 λ = ${lambdaNm.toFixed(2)} nm。` : '等待波长计算结果。',
+          lambdaNm ? `合成相对不确定度 ur = ${(relativeUncertainty * 100).toFixed(2)}%，结果可写为 λ = (${lambdaNm.toFixed(2)} ± ${uLambdaNm.toFixed(2)}) nm。` : '等待不确定度结果。',
+        ].map((text) => `<div class="summary-item">${text}</div>`).join('');
+
+        drawFitChart(fringePoints, fit);
+      }
+
+      function syncInputs() {
+        dInstrumentInput.value = String(state.dInstrumentMm);
+        distanceInstrumentInput.value = String(state.dDistanceInstrumentMm);
+      }
+
+      function renderAll() {
+        renderDTable();
+        renderFringeTable();
+        renderDeltaXRepeatTable();
+        renderImageTable();
+        syncInputs();
+        renderResults();
+      }
+
+      function resetToExample() {
+        state.dRows = structuredClone(DEFAULT_D_READINGS_M);
+        state.fringeRows = structuredClone(DEFAULT_FRINGE_ROWS);
+        state.deltaXRepeatRows = structuredClone(DEFAULT_DELTA_X_REPEAT_MM);
+        state.imageRows = structuredClone(DEFAULT_IMAGE_ROWS);
+        state.dInstrumentMm = DEFAULT_D_INSTRUMENT_MM;
+        state.dDistanceInstrumentMm = DEFAULT_D_DISTANCE_INSTRUMENT_MM;
+        renderAll();
+      }
+
+      function clearData() {
+        state.dRows = [0, 0, 0];
+        state.fringeRows = Array.from({ length: 10 }, (_, index) => ({ index: index + 1, fringeOrder: index, positionMm: 0 }));
+        state.deltaXRepeatRows = [0, 0, 0, 0, 0];
+        state.imageRows = Array.from({ length: 3 }, (_, index) => ({ index: index + 1, d1Mm: 0, d2Mm: 0 }));
+        renderAll();
+      }
+
+      document.addEventListener('input', (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLInputElement)) return;
+        const value = parseInputNumber(target.value);
+        const index = Number(target.dataset.index ?? -1);
+        switch (target.dataset.section) {
+          case 'd': if (index >= 0) state.dRows[index] = value; break;
+          case 'fringe-order': if (index >= 0) state.fringeRows[index].fringeOrder = value; break;
+          case 'fringe-position': if (index >= 0) state.fringeRows[index].positionMm = value; break;
+          case 'delta-x-repeat': if (index >= 0) state.deltaXRepeatRows[index] = value; break;
+          case 'image-d1': if (index >= 0) state.imageRows[index].d1Mm = value; break;
+          case 'image-d2': if (index >= 0) state.imageRows[index].d2Mm = value; break;
+          default: return;
+        }
+        if (target.dataset.section === 'fringe-order' || target.dataset.section === 'fringe-position') {
+          updateFringeSpacingCells();
+        }
+        if (target.dataset.section === 'image-d1' || target.dataset.section === 'image-d2') {
+          updateImageDerivedCells();
+        }
+        renderResults();
+      });
+
+      dInstrumentInput.addEventListener('input', () => {
+        state.dInstrumentMm = parseInputNumber(dInstrumentInput.value);
+        renderResults();
+      });
+
+      distanceInstrumentInput.addEventListener('input', () => {
+        state.dDistanceInstrumentMm = parseInputNumber(distanceInstrumentInput.value);
+        renderResults();
+      });
+
+      document.querySelector('#fillExampleBtn').addEventListener('click', resetToExample);
+      document.querySelector('#clearBtn').addEventListener('click', clearData);
+      renderAll();
+    </script>
+  </body>
+</html>

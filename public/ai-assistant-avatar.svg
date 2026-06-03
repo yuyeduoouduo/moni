@@ -1,0 +1,50 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="hair" x1="46" y1="28" x2="212" y2="176" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#B5E9FF"/>
+      <stop offset="0.45" stop-color="#64B7FF"/>
+      <stop offset="1" stop-color="#2C6CD0"/>
+    </linearGradient>
+    <linearGradient id="eye" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#1B327B"/>
+      <stop offset="1" stop-color="#6CCBFF"/>
+    </linearGradient>
+    <linearGradient id="body" x1="78" y1="122" x2="184" y2="238" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E9F2FF"/>
+    </linearGradient>
+  </defs>
+
+  <ellipse cx="128" cy="236" rx="54" ry="14" fill="#B4D7FF"/>
+  <path d="M128 32C178.81 32 218 68.88 218 116.5C218 164.12 185.92 196 128 196C70.08 196 38 164.12 38 116.5C38 68.88 77.19 32 128 32Z" fill="url(#hair)"/>
+  <path d="M78 98C84.2 79.2 95.4 63.67 111.6 51.4C113.53 72.86 120.84 89.17 133.54 100.33C141.09 84.86 148.05 69.39 154.42 53.92C175.17 68.91 187.7 88.1 192 111.5C182.46 93.96 171.39 85.18 158.79 85.18C146.19 85.18 136.14 91.56 128.64 104.32C119.46 95.37 112.63 86.5 108.15 77.71C101.93 90.13 92.54 101.56 80 112L78 98Z" fill="#233E92" fill-opacity="0.82"/>
+  <path d="M74 120C74 78.03 98.18 52 128 52C157.82 52 182 78.03 182 120C182 161.97 155.37 194 128 194C100.63 194 74 161.97 74 120Z" fill="#FFFDFC"/>
+  <ellipse cx="95.5" cy="122" rx="19.5" ry="25" fill="url(#eye)"/>
+  <ellipse cx="160.5" cy="122" rx="19.5" ry="25" fill="url(#eye)"/>
+  <ellipse cx="91" cy="116" rx="6" ry="6.5" fill="white"/>
+  <ellipse cx="156" cy="116" rx="6" ry="6.5" fill="white"/>
+  <path d="M115 149C122.11 156.19 133.89 156.19 141 149" stroke="#233E92" stroke-width="5" stroke-linecap="round"/>
+  <ellipse cx="82" cy="145" rx="10" ry="6" fill="#F5E2D8"/>
+  <ellipse cx="174" cy="145" rx="10" ry="6" fill="#F5E2D8"/>
+
+  <path d="M98 164H158C163.52 164 168 168.48 168 174V198C168 215.67 153.67 230 136 230H120C102.33 230 88 215.67 88 198V174C88 168.48 92.48 164 98 164Z" fill="url(#body)" stroke="#274492" stroke-width="4"/>
+  <circle cx="128" cy="188" r="13" fill="#D7EEFF" stroke="#3D6DCA" stroke-width="4"/>
+  <circle cx="128" cy="188" r="7" fill="#66C8FF"/>
+  <path d="M104 181L92 176" stroke="#64AFFF" stroke-width="4" stroke-linecap="round"/>
+  <path d="M152 181L164 176" stroke="#64AFFF" stroke-width="4" stroke-linecap="round"/>
+  <path d="M128 202V216" stroke="#64AFFF" stroke-width="4" stroke-linecap="round"/>
+
+  <path d="M90 171L74 182C70.87 184.15 69 187.72 69 191.52V208C69 214.63 74.37 220 81 220H84C90.63 220 96 214.63 96 208V182.5L90 171Z" fill="url(#body)" stroke="#274492" stroke-width="4"/>
+  <path d="M166 171L182 182C185.13 184.15 187 187.72 187 191.52V208C187 214.63 181.63 220 175 220H172C165.37 220 160 214.63 160 208V182.5L166 171Z" fill="url(#body)" stroke="#274492" stroke-width="4"/>
+  <path d="M88 214C84.5 224.5 76.33 230 63.5 230" stroke="#274492" stroke-width="5" stroke-linecap="round"/>
+  <path d="M168 214C171.5 224.5 179.67 230 192.5 230" stroke="#274492" stroke-width="5" stroke-linecap="round"/>
+
+  <path d="M112 224H120V248H104V232C104 227.58 107.58 224 112 224Z" fill="url(#body)" stroke="#274492" stroke-width="4"/>
+  <path d="M136 224H144C148.42 224 152 227.58 152 232V248H136V224Z" fill="url(#body)" stroke="#274492" stroke-width="4"/>
+  <path d="M102 248H122" stroke="#64AFFF" stroke-width="5" stroke-linecap="round"/>
+  <path d="M134 248H154" stroke="#64AFFF" stroke-width="5" stroke-linecap="round"/>
+  <path d="M66 79C58 90.33 54 102.33 54 115" stroke="#5A86F0" stroke-width="5" stroke-linecap="round"/>
+  <path d="M190 79C198 90.33 202 102.33 202 115" stroke="#5A86F0" stroke-width="5" stroke-linecap="round"/>
+  <ellipse cx="75" cy="52" rx="16" ry="8" transform="rotate(-36 75 52)" fill="white" fill-opacity="0.44"/>
+  <ellipse cx="62" cy="74" rx="6" ry="4" transform="rotate(-36 62 74)" fill="white" fill-opacity="0.44"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="512" viewBox="0 0 1024 512">
+  <rect width="1024" height="512" rx="22" fill="#181b20" stroke="#bfa46f" stroke-width="6"/>
+  <line x1="32" y1="58" x2="992" y2="58" stroke="#c54840" stroke-width="8"/>
+  <text x="44" y="140" fill="#efe4c6" font-family="Microsoft YaHei, Noto Sans SC, sans-serif" font-size="74" font-weight="700">钠灯电源</text>
+  <text x="44" y="214" fill="#d8caab" font-family="Consolas, Microsoft YaHei, monospace" font-size="44" font-weight="700">POWER SUPPLY</text>
+  <line x1="44" y1="250" x2="978" y2="250" stroke="#e4d8b8" stroke-width="4"/>
+  <text x="44" y="320" fill="#efe4c6" font-family="Microsoft YaHei, Noto Sans SC, sans-serif" font-size="40">启动前确认接线和开关状态</text>
+  <text x="44" y="378" fill="#baa985" font-family="Consolas, Microsoft YaHei, monospace" font-size="28">INPUT / OUTPUT / LAMP CONTROL</text>
+  <text x="44" y="432" fill="#d65c4a" font-family="Microsoft YaHei, Noto Sans SC, sans-serif" font-size="28" font-weight="700">WARNING  高压启动，请勿误触端子</text>
+</svg>

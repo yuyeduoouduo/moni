@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="256" viewBox="0 0 1024 256">
+  <rect width="1024" height="256" rx="18" fill="#1a1f24" stroke="#c5ad7b" stroke-width="6"/>
+  <line x1="26" y1="44" x2="998" y2="44" stroke="#be4a41" stroke-width="7"/>
+  <text x="38" y="112" fill="#efe4c6" font-family="Microsoft YaHei, Noto Sans SC, sans-serif" font-size="62" font-weight="700">光具座刻度基准</text>
+  <text x="38" y="168" fill="#d8caab" font-family="Consolas, Microsoft YaHei, monospace" font-size="34" font-weight="700">OPTICAL BENCH SCALE REFERENCE</text>
+  <text x="38" y="216" fill="#baa985" font-family="Consolas, Microsoft YaHei, monospace" font-size="24">POSITIONING / D MEASUREMENT / ALIGNMENT</text>
+</svg>

@@ -1,0 +1,144 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2048" height="2048" viewBox="0 0 2048 2048">
+  <defs>
+    <style>
+      .base { fill: #171b20; }
+      .panel { fill: #20262d; stroke: #8b7345; stroke-width: 4; rx: 18; }
+      .line { stroke: #d7c59d; stroke-width: 3; fill: none; }
+      .accent { stroke: #c7483f; stroke-width: 6; }
+      .title { fill: #efe4c4; font-family: "Microsoft YaHei", "Noto Sans SC", sans-serif; font-size: 44px; font-weight: 700; }
+      .sub { fill: #d8c9a2; font-family: "Microsoft YaHei", "Noto Sans SC", sans-serif; font-size: 24px; font-weight: 500; letter-spacing: 2px; }
+      .tiny { fill: #b9aa87; font-family: "Consolas", "Microsoft YaHei", monospace; font-size: 18px; letter-spacing: 1.5px; }
+      .mark { fill: #f1ead4; font-family: "Consolas", "Microsoft YaHei", monospace; font-size: 40px; font-weight: 700; }
+      .warn { fill: #d65b49; font-family: "Microsoft YaHei", "Noto Sans SC", sans-serif; font-size: 20px; font-weight: 700; }
+    </style>
+  </defs>
+
+  <rect class="base" width="2048" height="2048"/>
+
+  <g transform="translate(64 72)">
+    <g transform="translate(0 0)">
+      <rect class="panel" width="560" height="240" rx="18"/>
+      <line class="accent" x1="20" y1="34" x2="540" y2="34"/>
+      <text class="mark" x="34" y="90">No.01</text>
+      <text class="title" x="34" y="150">钠光灯</text>
+      <text class="sub" x="34" y="195">SODIUM LAMP</text>
+      <line class="line" x1="34" y1="214" x2="526" y2="214"/>
+      <text class="tiny" x="34" y="233">589.0/589.6 nm  实验光源</text>
+    </g>
+
+    <g transform="translate(640 0)">
+      <rect class="panel" width="560" height="240" rx="18"/>
+      <line class="accent" x1="20" y1="34" x2="540" y2="34"/>
+      <text class="mark" x="34" y="90">No.02</text>
+      <text class="title" x="34" y="150">聚光镜</text>
+      <text class="sub" x="34" y="195">CONDENSER</text>
+      <line class="line" x1="34" y1="214" x2="526" y2="214"/>
+      <text class="tiny" x="34" y="233">聚焦光束  改善照明均匀性</text>
+    </g>
+
+    <g transform="translate(1280 0)">
+      <rect class="panel" width="560" height="240" rx="18"/>
+      <line class="accent" x1="20" y1="34" x2="540" y2="34"/>
+      <text class="mark" x="34" y="90">No.03</text>
+      <text class="title" x="34" y="150">可调狭缝</text>
+      <text class="sub" x="34" y="195">ADJUSTABLE SLIT</text>
+      <line class="line" x1="34" y1="214" x2="526" y2="214"/>
+      <text class="tiny" x="34" y="233">缝宽可调  单位: mm</text>
+    </g>
+
+    <g transform="translate(0 320)">
+      <rect class="panel" width="560" height="240" rx="18"/>
+      <line class="accent" x1="20" y1="34" x2="540" y2="34"/>
+      <text class="mark" x="34" y="90">No.04</text>
+      <text class="title" x="34" y="150">双棱镜</text>
+      <text class="sub" x="34" y="195">FRESNEL BIPRISM</text>
+      <line class="line" x1="34" y1="214" x2="526" y2="214"/>
+      <text class="tiny" x="34" y="233">波前分割  形成双虚光源</text>
+    </g>
+
+    <g transform="translate(640 320)">
+      <rect class="panel" width="560" height="240" rx="18"/>
+      <line class="accent" x1="20" y1="34" x2="540" y2="34"/>
+      <text class="mark" x="34" y="90">No.05</text>
+      <text class="title" x="34" y="150">辅助透镜</text>
+      <text class="sub" x="34" y="195">AUXILIARY LENS</text>
+      <line class="line" x1="34" y1="214" x2="526" y2="214"/>
+      <text class="tiny" x="34" y="233">用于双虚光源成像测量</text>
+    </g>
+
+    <g transform="translate(1280 320)">
+      <rect class="panel" width="560" height="240" rx="18"/>
+      <line class="accent" x1="20" y1="34" x2="540" y2="34"/>
+      <text class="mark" x="34" y="90">No.06</text>
+      <text class="title" x="34" y="150">测微目镜</text>
+      <text class="sub" x="34" y="195">MICROMETER EYEPIECE</text>
+      <line class="line" x1="34" y1="214" x2="526" y2="214"/>
+      <text class="tiny" x="34" y="233">读取条纹间距与像距</text>
+    </g>
+
+    <g transform="translate(0 640)">
+      <rect class="panel" width="560" height="240" rx="18"/>
+      <line class="accent" x1="20" y1="34" x2="540" y2="34"/>
+      <text class="mark" x="34" y="90">No.07</text>
+      <text class="title" x="34" y="150">刻度尺</text>
+      <text class="sub" x="34" y="195">OPTICAL BENCH RULER</text>
+      <line class="line" x1="34" y1="214" x2="526" y2="214"/>
+      <text class="tiny" x="34" y="233">器材定位基准</text>
+    </g>
+
+    <g transform="translate(640 640)">
+      <rect class="panel" width="560" height="240" rx="18"/>
+      <line class="accent" x1="20" y1="34" x2="540" y2="34"/>
+      <text class="mark" x="34" y="90">No.08</text>
+      <text class="title" x="34" y="150">电源</text>
+      <text class="sub" x="34" y="195">POWER SUPPLY</text>
+      <line class="line" x1="34" y1="214" x2="526" y2="214"/>
+      <text class="tiny" x="34" y="233">启动前请确认接线状态</text>
+    </g>
+
+    <g transform="translate(1280 640)">
+      <rect class="panel" width="560" height="240" rx="18"/>
+      <line class="accent" x1="20" y1="34" x2="540" y2="34"/>
+      <text class="mark" x="34" y="90">LAB</text>
+      <text class="title" x="34" y="150">双棱镜干涉实验</text>
+      <text class="sub" x="34" y="195">BIPRISM INTERFERENCE LAB</text>
+      <line class="line" x1="34" y1="214" x2="526" y2="214"/>
+      <text class="tiny" x="34" y="233">PHYSICS OPTICS / TEACHING ASSET</text>
+    </g>
+
+    <g transform="translate(0 980)">
+      <rect class="panel" width="900" height="140" rx="14"/>
+      <line class="accent" x1="22" y1="28" x2="878" y2="28"/>
+      <text class="title" x="34" y="85">注意：保持各元件等高共轴，避免触碰光学表面</text>
+      <text class="warn" x="34" y="118">CAUTION / DO NOT TOUCH OPTICAL SURFACE</text>
+    </g>
+
+    <g transform="translate(980 980)">
+      <rect class="panel" width="860" height="140" rx="14"/>
+      <line class="accent" x1="22" y1="28" x2="838" y2="28"/>
+      <text class="title" x="34" y="85">教学演示器材 / Physics Optics Teaching Instrument</text>
+      <text class="tiny" x="34" y="118">适用于：双棱镜干涉测波长、虚光源测量、条纹观察</text>
+    </g>
+
+    <g transform="translate(0 1190)">
+      <rect class="panel" width="420" height="110" rx="14"/>
+      <text class="title" x="28" y="70">ON / OFF</text>
+      <text class="tiny" x="28" y="96">POWER SWITCH LABEL</text>
+    </g>
+    <g transform="translate(470 1190)">
+      <rect class="panel" width="420" height="110" rx="14"/>
+      <text class="title" x="28" y="70">FOCUS</text>
+      <text class="tiny" x="28" y="96">MICROMETER CONTROL</text>
+    </g>
+    <g transform="translate(940 1190)">
+      <rect class="panel" width="420" height="110" rx="14"/>
+      <text class="title" x="28" y="70">SLIT WIDTH</text>
+      <text class="tiny" x="28" y="96">ADJUSTMENT RING</text>
+    </g>
+    <g transform="translate(1410 1190)">
+      <rect class="panel" width="430" height="110" rx="14"/>
+      <text class="title" x="28" y="70">ALIGN</text>
+      <text class="tiny" x="28" y="96">OPTICAL AXIS SETUP</text>
+    </g>
+  </g>
+</svg>
