@@ -41,9 +41,6 @@ const SCALE_CHANNEL_WIDTH = 0.072
 const RAIL_OFFSET_Z = 0.052
 const RAIL_STRIP_WIDTH = 0.022
 const END_BLOCK_WIDTH = 0.11
-const CARRIAGE_WIDTH = 0.18
-const CARRIAGE_DEPTH = 0.14
-const CARRIAGE_HEIGHT = 0.048
 const LIGHT_AXIS_OFFSET = 0.165
 const TARGET_X = {
   lamp: -0.24,
@@ -453,71 +450,6 @@ function createProceduralBench(spec: Spec) {
   runtimes.set(spec.key, { spec, group, root })
 }
 
-function createCarriage() {
-  const carriage = new THREE.Group()
-  carriage.name = 'OpticalBenchCarriage'
-
-  const baseMaterial = new THREE.MeshStandardMaterial({ color: '#23292f', roughness: 0.56, metalness: 0.26 })
-  const clampMaterial = new THREE.MeshStandardMaterial({ color: '#151a1f', roughness: 0.52, metalness: 0.24 })
-  const knobMaterial = new THREE.MeshStandardMaterial({ color: '#8d2329', roughness: 0.46, metalness: 0.18 })
-  const postMaterial = new THREE.MeshStandardMaterial({ color: '#aeb6bf', roughness: 0.26, metalness: 0.84 })
-
-  const plate = new THREE.Mesh(
-    new THREE.BoxGeometry(CARRIAGE_WIDTH, CARRIAGE_HEIGHT, CARRIAGE_DEPTH),
-    baseMaterial,
-  )
-  plate.name = 'CarriagePlate'
-  plate.castShadow = true
-  plate.receiveShadow = true
-  carriage.add(plate)
-
-  ;[-1, 1].forEach((sign) => {
-    const clamp = new THREE.Mesh(
-      new THREE.BoxGeometry(0.026, CARRIAGE_HEIGHT + 0.012, 0.03),
-      clampMaterial,
-    )
-    clamp.name = 'CarriageClamp'
-    clamp.position.set(sign * (CARRIAGE_WIDTH * 0.5 - 0.013), -0.002, 0)
-    clamp.castShadow = true
-    clamp.receiveShadow = true
-    carriage.add(clamp)
-  })
-
-  const slot = new THREE.Mesh(
-    new THREE.BoxGeometry(CARRIAGE_WIDTH - 0.05, 0.014, 0.06),
-    new THREE.MeshStandardMaterial({ color: '#0d1115', roughness: 0.78, metalness: 0.1 }),
-  )
-  slot.name = 'CarriageSlot'
-  slot.position.set(0, 0.008, 0)
-  carriage.add(slot)
-
-  const post = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.06, 20), postMaterial)
-  post.name = 'CarriagePost'
-  post.position.set(0, CARRIAGE_HEIGHT * 0.5 + 0.03, 0)
-  post.castShadow = true
-  carriage.add(post)
-
-  ;[-1, 1].forEach((sign) => {
-    const knob = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.032, 18), knobMaterial)
-    knob.name = 'CarriageKnob'
-    knob.rotation.z = Math.PI / 2
-    knob.position.set(sign * 0.046, 0, CARRIAGE_DEPTH * 0.5 + 0.01)
-    knob.castShadow = true
-    carriage.add(knob)
-  })
-
-  return carriage
-}
-
-function attachCarriage(runtime: Runtime) {
-  if (runtime.carriage || runtime.spec.key === 'table' || runtime.spec.key === 'power') return
-
-  const carriage = createCarriage()
-  carriage.position.set(0, -CARRIAGE_HEIGHT * 0.5 - 0.001, 0)
-  runtime.group.add(carriage)
-  runtime.carriage = carriage
-}
-
 function computeSnapshot() {
   const coherence = clamp((state.aligned / 100) * 0.5 + (state.focus / 100) * 0.3 + (1 - Math.abs(state.slitWidth - 0.18) / 0.42) * 0.2, 0, 1)
   const clarity = clamp((state.focus / 100) * 0.65 + coherence * 0.35, 0, 1)
@@ -717,7 +649,6 @@ function layoutLoadedModels() {
   for (const runtime of runtimes.values()) {
     clampToTable(runtime)
     fitToBench(runtime)
-    attachCarriage(runtime)
     basePositions.set(runtime.spec.key, runtime.group.position.clone())
     baseScales.set(runtime.spec.key, runtime.root.scale.clone())
   }
